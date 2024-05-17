@@ -1,0 +1,15 @@
+#using machine learning, find which parameters are effecting the obs data by comparing it to the ibs data.
+#use this classification of noise, compare it to the percieved ambient field and remove it.
+#keep doing this for all the instruments we feel are important
+#compare it to the l2 data we have and use certain periods as validation data as well as what we are expecting to see.
+#use this newly cleaned data to train the model if it is seemed to be better.
+#
+#I want to do stuff that has a clear outcome. the one thing i am struggling with with the heater profiles is that we dont know when we're moving in the
+#    correct direction.
+#whether thats in milestones we need to hit or in the results we are getting, it would be nice to have a metric of success
+
+#spice kernels for rtn
+#find heater profiles when heaters turn open
+#same time for both sensors
+#eas temp
+#classify heater profiles by time 

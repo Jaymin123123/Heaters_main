@@ -108,7 +108,7 @@ if __name__ == "__main__":
     
 
     # load data and features
-    features_ = pd.read_csv(h.LOCAL_HK_FOLDER + "features.csv", parse_dates = ['Date'])
+    features_ = pd.read_csv("features.csv", parse_dates = ['Date'])
     
 
     # get rid of the bad times
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     #! could make these input variables to the script
     ds_period = args.period
     ds_duration = args.duration
-    IBSorOBS = args.inst
+    IBSorOBS = 'IBS'
 
     HP_TIME_BINS = np.arange(0, ds_duration, ds_period)
 
@@ -159,7 +159,7 @@ if __name__ == "__main__":
     starting = 0
     steps =  args.steps
     period = np.round(args.duration//args.steps)
-    val_date = datetime(2023,7,31)
+    val_date = datetime(2024,7,31)
     val_features = without_bad_dates[(without_bad_dates['Date'] > val_date)]
     features = without_bad_dates.loc[without_bad_dates['Date'] < val_date]
     print(bad_dates)
@@ -221,8 +221,8 @@ if __name__ == "__main__":
             # After concatenating dfs into data
         if 'R' in all_data.columns and 'T' in all_data.columns and 'N' in all_data.columns:
             # Assuming 'R', 'T', 'N' are your target features and others are input features
-            X = all_data.drop(['R', 'T', 'N', 'hp_id', 'Time', 'DistanceToVenus', 'Date'], axis=1)
-            y = all_data['R']
+            X = all_data.drop(['R', 'T', 'N', 'hp_id', 'Time', 'DistanceToVenus', 'Date', 'DistanceToEarth'], axis=1)
+            y = all_data['T']
 
             # Check if there's enough data to perform a split
             if len(X) > 10:  # Arbitrary small number to ensure there's enough data
@@ -240,19 +240,31 @@ if __name__ == "__main__":
             'HGA evelvation change',
             'No time A off'
         ]
-        
-        
+        #NIS = x_train
+        #rfe = RFE(estimator = RandomForestRegressor(), n_features_to_select=20, step = 1, verbose=1)
+        #fittings1 = rfe.fit(x_train, y_train)
+        #
+        #for i in range(x_train.shape[1]):
+        #    print(f'Column: {x_train.keys()[i]}, Selected {rfe.support_[i]}, Rank: {rfe.ranking_[i]:.3f}')        
+        #
+        #x_train = rfe.transform(x_train)
+        #x_test = rfe.transform(x_test)
+        #
+        ## save the columns to keep
+        #selected_features = rfe.support_
+        #
+        #dump(selected_features, f'Models/nans/{IBSorOBS}_{args.tune}_{ds_period}_{ds_duration}_features_{starting}.joblib')
+#
         mapper_list = []
         for key in x_test.keys():
             if any(substring in key for substring in no_scaling_names):
                 mapper_list.append((key, None))
             else:
                 mapper_list.append(([key], RobustScaler()))
-
+#
         mapper = DataFrameMapper(mapper_list , df_out = True)
         x_train = mapper.fit_transform(x_train)
         x_test = mapper.fit_transform(x_test)
-        #if args.tune == 'untuned':
         search = RandomForestRegressor()
         search.fit(x_train, y_train)
 #
@@ -268,13 +280,18 @@ if __name__ == "__main__":
         feature_names = X.columns
         print(len(feature_names), len(importance_percentages))
         importance_df = pd.DataFrame({'Feature': feature_names, 'Importance (%)': importance_percentages}).sort_values(by='Importance (%)', ascending=False)
-        importance_df.to_csv(f'Models/RF_importance/{IBSorOBS}_untuned_{ds_period}_{ds_duration}_importances_{starting}.csv')
+        importance_df.to_csv(f'Models/RF_IMP_T_IBS/{IBSorOBS}_untuned_{ds_period}_{ds_duration}_importances_{starting}_T_IBS.csv')
         ## save the model
-        dump(search, f"Models/RF/{IBSorOBS}_{args.tune}_{ds_period}_{ds_duration}_{starting}.joblib")
         
         starting += period
 
         del search
+        del x_train
+        del x_test
+        del y_train
+        del y_test
+
+
 
 
 
