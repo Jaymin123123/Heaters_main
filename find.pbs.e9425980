@@ -1,0 +1,7 @@
+RuntimeError: module compiled against API version 0xe but this version of numpy is 0xd
+Traceback (most recent call last):
+  File "/rds/general/user/js6523/home/Heaters_main-1/finding_profiles.py", line 10, in <module>
+    duty_cycle = h.load_HK('solo_ANC_sc-thermal-mag', start, end)
+  File "/rds/general/user/js6523/home/Heaters_main-1/helpers.py", line 66, in load_HK
+    rds_list = os.listdir(year_folder)
+FileNotFoundError: [Errno 2] No such file or directory: 'Z:\\Heaters\\housekeeping\\/solo_ANC_sc-thermal-mag/2023'
