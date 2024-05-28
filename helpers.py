@@ -56,11 +56,123 @@ def local_HK_fname(hk_name, date):
     date_str = date.strftime("%Y%m%d")
     return LOCAL_HK_FOLDER + '/' + hk_name + '/' + str(date.year) + '/' + hk_name + "_" + date_str + ".csv"
 
+#def load_HK(hk_name, start, end, extension = '.txt'):
+#    
+#    fname_dates = get_dates(start, end)
+#    
+#    # load the rds file list anyway, as I might need to use it
+#    year = str(fname_dates[0].year)
+#    year_folder = RDS_FOLDER + '/' + hk_name + '/' + year
+#    rds_list = os.listdir(year_folder)
+#    
+#    dfs = []
+#
+#    for date in fname_dates:
+#        date_str = date.strftime("%Y%m%d")
+#        
+#        # if this exists as a .csv then load that
+#        local_name = local_HK_fname(hk_name, date)
+#        
+#        if os.path.exists(local_name):
+#            #load the local data
+#            df = pd.read_csv(local_name, parse_dates = ['Time'])
+#            df.set_index('Time', inplace = True)
+#            dfs.append(df)
+#        else:
+#            # check you are in the right rds folder
+#            if str(date.year) != year:
+#                year = str(date.year)
+#                year_folder = RDS_FOLDER + '/' + hk_name + '/' + year
+#                rds_list = os.listdir(year_folder)
+#            
+#            # load rds data
+#            pattern = r'.*'+ date_str + r'\w*' + extension
+#            r = re.compile(pattern)
+#            # fnames = list(filter(r.match, mylist)) # Read Note below
+#            matches = [string for string in rds_list if re.search(pattern, string)]
+#            
+#            if len(matches) > 0:
+#                # get the last version
+#                fname = sorted(matches, key=lambda x:x[-6:-4])[-1]
+#                
+#                rds_path = RDS_FOLDER + '/' + hk_name + '/' + str(date.year) + '/' + fname
+#                try:
+#                    if hk_name == 'solo_ANC_sc-thermal-mag':
+#                        dtype = {
+#                            "IFA_HTR1_GR5_ST": str,
+#                            "IFA_HTR1_GR5_TSW5_ST": str,
+#                            "IFA_HTR2_GR5_ST": str,
+#                            "IFA_HTR2_GR5_TSW5_ST": str,
+#                            "IFA_HTR1_LCL5_TM": float,
+#                            "IFA_HTR2_LCL5_TM": float,
+#                            "IFB_HTR1_GR5_ST": str,
+#                            "IFB_HTR1_GR5_TSW5_ST": str,
+#                            "IFB_HTR2_GR5_ST": str,
+#                            "IFB_HTR2_GR5_TSW5_ST": str,
+#                            "IFB_HTR1_LCL5_TM": float,
+#                            "IFB_HTR2_LCL5_TM": float,
+#                            "ANP_1_2_2 MAG OBS": float,
+#                            "ANP_1_2_3 MAG IBS": float,
+#                            "ANP_2_1_6 MAG OBS": float,
+#                            "ANP_2_1_9 MAG IBS": float,
+#                            "ANP_3_1_13 MAG-OBS": float,
+#                            "ANP_3_1_14 MAG-IBS": float,
+#                            "ANP_1_2_2 MAG OBS RIUB": float,
+#                            "ANP_1_2_3 MAG IBS RIUB": float,
+#                            "ANP_2_1_6 MAG OBS RIUB": float,
+#                            "ANP_2_1_9 MAG IBS RIUB": float,
+#                            "ANP_3_1_13 MAG-OBS RIUB": float,
+#                            "ANP_3_1_14 MAG-IBS RIUB": float,
+#                        }
+#                        
+#                        # # now take out the two columns with continuous data and save 
+#                        # before June 22 2020 the datafiles are massive
+#                        # continuous_data = df[["IFB_HTR1_LCL5_TM", "IFB_HTR2_LCL5_TM"]].copy()
+#                        # on_off_data = df.drop(columns=["IFB_HTR1_LCL5_TM", "IFB_HTR2_LCL5_TM"]).dropna(how='all', axis = 0)
+#                    elif hk_name == 'solo_ANC_sc-lcl-mag':
+#                        dtype = {
+#                            "A_LCL2_16 MAG-B PWR ST": str,
+#                            "A_LCL4_17 MAG-A ST": str,
+#                            "A_LCL2_16 MAG-B PWR TM": float,
+#                            "A_LCL4_17 MAG-A TM": float,
+#                            "B_LCL2_16 MAG-B PWR ST": str,
+#                            "B_LCL4_17 MAG-A ST": str,
+#                            "B_LCL2_16 MAG-B PWR TM": float,
+#                            "B_LCL4_17 MAG-A T": float,
+#                        }
+#                    else:
+#                        dtype=False
+#                    rds_data = load_rds_file(rds_path, dtype = dtype, extension = extension)
+#
+#                    
+#                    #save for next time
+#                    local_folder = LOCAL_HK_FOLDER + '/' + hk_name + '/' + str(date.year)
+#                    if not os.path.exists(local_folder):
+#                        os.makedirs(local_folder)
+#
+#                    # if hk_name == 'solo_ANC_sc-thermal-mag':
+#                    #     continuous_data.to_csv(local_name[:-4]+ '_continous.txt')
+#                    #     on_off_data.to_csv(local_name[:-4]+ '_on_off.txt')
+#                    # else:
+#                        
+#                    rds_data.to_csv(local_name)
+#                    
+#                    dfs.append(rds_data)
+#                    
+#                except IndexError:
+#                    print(f'Skipped {date}')
+#                    pass
+#    
+#    df = pd.concat(dfs)
+#    
+#    return df
+#
+
 def load_HK(hk_name, start, end, extension = '.txt'):
     
     fname_dates = get_dates(start, end)
     
-    # load the rds file list anyway, as I might need to use it
+    # Load the RDS file list anyway, as I might need to use it
     year = str(fname_dates[0].year)
     year_folder = RDS_FOLDER + '/' + hk_name + '/' + year
     rds_list = os.listdir(year_folder)
@@ -70,30 +182,29 @@ def load_HK(hk_name, start, end, extension = '.txt'):
     for date in fname_dates:
         date_str = date.strftime("%Y%m%d")
         
-        # if this exists as a .csv then load that
+        # If this exists as a .csv then load that
         local_name = local_HK_fname(hk_name, date)
         
         if os.path.exists(local_name):
-            #load the local data
-            df = pd.read_csv(local_name, parse_dates = ['Time'])
-            df.set_index('Time', inplace = True)
+            # Load the local data
+            df = pd.read_csv(local_name, parse_dates=['Time'])
+            df.reset_index(inplace=True)  # Convert index to column
             dfs.append(df)
         else:
-            # check you are in the right rds folder
+            # Check you are in the right RDS folder
             if str(date.year) != year:
                 year = str(date.year)
                 year_folder = RDS_FOLDER + '/' + hk_name + '/' + year
                 rds_list = os.listdir(year_folder)
             
-            # load rds data
-            pattern = r'.*'+ date_str + r'\w*' + extension
+            # Load RDS data
+            pattern = r'.*' + date_str + r'\w*' + extension
             r = re.compile(pattern)
-            # fnames = list(filter(r.match, mylist)) # Read Note below
             matches = [string for string in rds_list if re.search(pattern, string)]
             
             if len(matches) > 0:
-                # get the last version
-                fname = sorted(matches, key=lambda x:x[-6:-4])[-1]
+                # Get the last version
+                fname = sorted(matches, key=lambda x: x[-6:-4])[-1]
                 
                 rds_path = RDS_FOLDER + '/' + hk_name + '/' + str(date.year) + '/' + fname
                 try:
@@ -124,11 +235,6 @@ def load_HK(hk_name, start, end, extension = '.txt'):
                             "ANP_3_1_13 MAG-OBS RIUB": float,
                             "ANP_3_1_14 MAG-IBS RIUB": float,
                         }
-                        
-                        # # now take out the two columns with continuous data and save 
-                        # before June 22 2020 the datafiles are massive
-                        # continuous_data = df[["IFB_HTR1_LCL5_TM", "IFB_HTR2_LCL5_TM"]].copy()
-                        # on_off_data = df.drop(columns=["IFB_HTR1_LCL5_TM", "IFB_HTR2_LCL5_TM"]).dropna(how='all', axis = 0)
                     elif hk_name == 'solo_ANC_sc-lcl-mag':
                         dtype = {
                             "A_LCL2_16 MAG-B PWR ST": str,
@@ -141,22 +247,17 @@ def load_HK(hk_name, start, end, extension = '.txt'):
                             "B_LCL4_17 MAG-A T": float,
                         }
                     else:
-                        dtype=False
-                    rds_data = load_rds_file(rds_path, dtype = dtype, extension = extension)
+                        dtype = False
+                    rds_data = load_rds_file(rds_path, dtype=dtype, extension=extension)
 
-                    
-                    #save for next time
+                    # Save for next time
                     local_folder = LOCAL_HK_FOLDER + '/' + hk_name + '/' + str(date.year)
                     if not os.path.exists(local_folder):
                         os.makedirs(local_folder)
 
-                    # if hk_name == 'solo_ANC_sc-thermal-mag':
-                    #     continuous_data.to_csv(local_name[:-4]+ '_continous.txt')
-                    #     on_off_data.to_csv(local_name[:-4]+ '_on_off.txt')
-                    # else:
-                        
                     rds_data.to_csv(local_name)
                     
+                    rds_data.reset_index(inplace=True)  # Convert index to column
                     dfs.append(rds_data)
                     
                 except IndexError:
@@ -166,6 +267,7 @@ def load_HK(hk_name, start, end, extension = '.txt'):
     df = pd.concat(dfs)
     
     return df
+
 
 def load_rds_file(fname, dtype = False, extension = '.txt'):
     if extension == '.txt':
@@ -533,3 +635,12 @@ def get_var_time_bins(ds_duration):
             )
         )
     return var_hp_time_bins
+
+def get_times():
+    times = []
+    segments_real = pd.read_csv('segments_seconds.csv')
+    for i in range(len(segments_real)):
+        time_str = segments_real.iloc[i]['Time'] 
+        time = pd.to_datetime(time_str)
+        times.append(time)
+    return times
