@@ -9,7 +9,7 @@ start = datetime(2023,6,26)
 end = datetime(2023,6,26)
 duty_cycle = h.load_HK('solo_ANC_sc-thermal-mag', start, end)
 
-cdf_file = '26006/solo_L1_mag-ibs-normal_20230626_V01.cdf'
+cdf_file = '26006/solo_L1_mag-obs-normal_20230626_V01.cdf'
 cdf_file_data = fh.load_l1_data(cdf_file)
 
 duty_cycle_csv = pd.read_csv('duty_cycle.csv')
@@ -41,6 +41,6 @@ segments_df = pd.DataFrame(duty_cycle_csv['Time'][segments])
 fh.segments_minus_time('segments.csv', 7)
 
 # Extract the profiles
-fh.extract_profiles_5(segments_df, cdf_file, '5minprofs')
+fh.extract_profiles_10(segments_df, cdf_file, '10minprofs')
 
 
